@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        rb.GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
         rb.drag = airDrag; // Physics E: Air Resistance
     }
 
