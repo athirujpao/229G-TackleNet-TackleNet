@@ -13,10 +13,10 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb.GetComponent<Rigidbody>();
-        rb.drag = airDrag // Physics E: Air Resistance
+        rb.drag = airDrag; // Physics E: Air Resistance
     }
 
-    Void Update() 
+    void Update() 
     {
         float moveX = Input.GetAxis("Horizontal");
         float moveZ = Input.GetAxis("Vertical");
@@ -27,6 +27,21 @@ public class Player : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.AddForce(Vector3.up * jumpoForce, ForceMode.Impulse);
+        }
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+        }
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
         }
     }
 }
