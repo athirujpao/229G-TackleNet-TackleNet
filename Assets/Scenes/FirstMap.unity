@@ -741,8 +741,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de8b61a516c054d4795d7487bd4dace4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  netAnchor: {fileID: 0}
-  netProjectile: {fileID: 0}
+  netAnchor: {fileID: 852390611}
+  netProjectile: {fileID: 577329875}
   throwForce: 15
   ropeLine: {fileID: 0}
 --- !u!1 &1687192327
