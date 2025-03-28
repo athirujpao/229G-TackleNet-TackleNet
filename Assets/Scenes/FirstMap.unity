@@ -615,7 +615,6 @@ GameObject:
   - component: {fileID: 1201829581}
   - component: {fileID: 1201829580}
   - component: {fileID: 1201829582}
-  - component: {fileID: 1201829583}
   - component: {fileID: 1201829584}
   m_Layer: 0
   m_Name: Player
@@ -683,23 +682,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveForce: 10
-  jumpoForce: 5
+  jumpForce: 5
   airDrag: 4
---- !u!114 &1201829583
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1201829579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de8b61a516c054d4795d7487bd4dace4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  netAnchor: {fileID: 852390611}
-  netProjectile: {fileID: 577329875}
-  throwForce: 15
+  swingForce: 10
+  maxSwingDistance: 10
   ropeLine: {fileID: 0}
 --- !u!65 &1201829584
 BoxCollider:

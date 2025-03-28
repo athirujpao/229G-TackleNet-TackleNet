@@ -6,15 +6,13 @@ public class Player : MonoBehaviour
 {
     // movement setting
     public float moveForce = 10f;
-    public float jumpoForce = 5f;
+    public float jumpForce = 5f;
     public float airDrag = 0.5f;
 
     // Swinging setting 
     public float swingForce = 10f;
     public float maxSwingDistance = 10f;
-    public transform hookPoint;
     public LineRenderer ropeLine;
-
 
     // other variables
     Rigidbody rb;
@@ -27,12 +25,37 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.drag = airDrag; // Physics E: Air Resistance
+
+        if (ropeLine != null)
+    {
+        ropeLine.positionCount = 2;      // Must set to 2 to avoid index error
+        ropeLine.enabled = false;        // Optional: hide rope until swinging
+    }
     }
 
     // Update movement, jump and swinging logic
     void Update() 
     {
-        
+        if (!isSwinging) 
+        {
+            HandleMovement();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)  
+        {
+            Jump();
+        }
+
+        if (isSwinging)  // If swinging, apply swinging force
+        {
+            HandleSwinging();
+        }
+
+        // Handle hook attempt when player clicks
+        if (Input.GetMouseButtonDown(0) && !isSwinging)
+        {
+            TryToHook();  // Try to hook onto a surface
+        }
 
         
     }
@@ -55,8 +78,11 @@ public class Player : MonoBehaviour
         rb.AddForce(direction * swingForce, ForceMode.Force);
 
         // Update rope visual to show the swinging motion (LineRenderer)
-        ropeLine.SetPosition(0, hookPoint.position);
-        ropeLine.SetPosition(1, transform.position);
+        if (ropeLine != null)
+        {
+            ropeLine.SetPosition(0, swingAnchor);
+            ropeLine.SetPosition(1, transform.position);
+        }
     }
     
     void Jump()
@@ -75,9 +101,14 @@ public class Player : MonoBehaviour
             {
                 swingAnchor = hit.point;  // Set the hook point
                 isSwinging = true;  // Start swinging
-                ropeLine.enabled = true;  // Enable rope visual effect
+                if (ropeLine != null)
+                {
+                ropeLine.enabled = true; // Enable rope visual effect
+                }  
+                
                 AttachSwing(hit);  // Attach spring joint to start physics-based swinging
             }
+            //else will be like robe fall like cant reach
         }
     }
 
@@ -86,7 +117,9 @@ public class Player : MonoBehaviour
     {
         // Don't Forget to add a SpringJoint component for simulating the swing
         SpringJoint spring = gameObject.AddComponent<SpringJoint>();
+        spring.autoConfigureConnectedAnchor = false;
         spring.connectedBody = hit.rigidbody;  // Connect spring to hit surface's Rigidbody
+        
         spring.spring = 10f;  // Control strength of spring (affects swing speed)
         spring.damper = 1f;  // Damping to smooth out the swinging motion
         spring.maxDistance = maxSwingDistance;  // Limit how far the player can swing
