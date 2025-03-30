@@ -2,20 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : BaseCharacter
 {
     // movement setting
-    public float moveForce = 10f;
-    public float jumpForce = 5f;
+    
     public float airDrag = 0.5f;
 
     // Swinging setting 
     public float swingForce = 10f;
-    public float maxSwingDistance = 10f;
+    public float maxSwingDistance = 30f;
     public LineRenderer ropeLine;
 
     // other variables
-    Rigidbody rb;
+    
     bool isGrounded = false;
     bool isSwinging = false;
     Vector3 swingAnchor; 
@@ -23,11 +22,15 @@ public class Player : MonoBehaviour
     [SerializeField] Transform cameraTransform;
     
     // awake gonna get in animator on squid to work but after the ui and end credit is finished
+    protected override void Awake()
+    {
+        base.Awake(); 
+    }
 
     // Initializes the player's Rigidbody and LineRenderer
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        
         rb.drag = airDrag; // Physics E: Air Resistance
 
         if (ropeLine != null)
@@ -85,12 +88,12 @@ public class Player : MonoBehaviour
         camRight.y = 0;
         camRight.Normalize();
 
-        Vector3 move = camForward * moveZ + camRight * moveX;
+        Vector3 move = (camForward * moveZ + camRight * moveX).normalized;
         rb.AddForce(move.normalized* moveForce, ForceMode.Force); // Physics C: Based Movement 
         // make model facing the right direction i find how to made this in reddit thank for random guy that name deleted account 
-        if (move != Vector3.zero)
+        if (move.magnitude > 0.1f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(move);
+            Quaternion targetRotation = Quaternion.LookRotation(move, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
         }
     }
@@ -111,7 +114,7 @@ public class Player : MonoBehaviour
         }
     }
     
-    void Jump()
+    new void Jump()
     {
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
@@ -119,10 +122,22 @@ public class Player : MonoBehaviour
     // Attempt to hook to a valid surface
     void TryToHook()
     {
+        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit; 
         
-        if (Physics.Raycast(transform.position, transform.forward, out hit, maxSwingDistance))
+        if (Physics.Raycast(ray, out hit, maxSwingDistance))
         {
+
+            // added the coin check hook if not swingable not gonna swinging
+            if (hit.collider.CompareTag("Coin"))
+            {
+                Coin coin = hit.collider.GetComponent<Coin>();
+                if (coin != null)
+                {
+                    coin.CollectByHook(); // Only for hookable coins
+                }
+            }
+
             if (hit.collider.CompareTag("Swingable"))  
             {
                 swingAnchor = hit.point;  // Set the hook point
@@ -135,15 +150,7 @@ public class Player : MonoBehaviour
                 AttachSwing(hit);  // Attach spring joint to start physics-based swinging
             }
             //else will be like robe fall like cant reach
-            // added the coin hook
-            if (hit.collider.CompareTag("Coin"))
-            {
-                Coin coin = hit.collider.GetComponent<Coin>();
-                if (coin != null)
-                {
-                    coin.CollectByHook(); // Only for hookable coins
-                }
-            }
+            
             
         }
     }

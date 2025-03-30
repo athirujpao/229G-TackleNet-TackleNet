@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Ground
   - Net
+  - Coin
+  - Swingable
   layers:
   - Default
   - TransparentFX
