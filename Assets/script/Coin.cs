@@ -12,6 +12,7 @@ public class Coin : MonoBehaviour
     private bool collected = false;
     void Update() 
     {
+        
         transform.Rotate(0 , 90 * Time.deltaTime,0);
     }
     // Called when player physically touches the coin
@@ -40,6 +41,9 @@ public class Coin : MonoBehaviour
     {
         collected = true;
 
+        GameUIManager ui = FindObjectOfType<GameUIManager>();
+        if (ui != null) ui.AddCoin();
+        
         // TODO: Add score logic here (e.g., call GameManager or UIController)
         Debug.Log($"Collected coin worth {coinValue}");
 
