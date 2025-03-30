@@ -5,25 +5,23 @@ using UnityEngine;
 public class PlayerCamera : MonoBehaviour
 {
     public Transform target; // Player's Transform
-    public Vector3 offset = new Vector3(0, 5, -10); // Default offset behind player
-    public float smoothSpeed = 0.125f;  // Camera smoothness
-    public float rotationSpeed = 5f;    // Mouse sensitivity
+    public Vector3 offset = new Vector3(0, 5, -7); 
+    public float smoothSpeed = 0.125f;  
+    public float rotationSpeed = 5f;    
 
-    private float yaw = 0f;
-    private float pitch = 15f;
+    float yaw;
+    float pitch;
 
     void LateUpdate()
     {
-        // Mouse input
-        yaw += Input.GetAxis("Mouse X") * rotationSpeed;
-        pitch -= Input.GetAxis("Mouse Y") * rotationSpeed;
-        pitch = Mathf.Clamp(pitch, 10f, 45f); 
+        yaw += Input.GetAxis("Mouse X") * sensitivity;
+        pitch -= Input.GetAxis("Mouse Y") * sensitivity;
+        pitch = Mathf.Clamp(pitch, -30f, 60f);
 
         Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
         Vector3 desiredPosition = target.position + rotation * offset;
 
-        // Smooth follow
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
-        transform.LookAt(target);
+        transform.position = desiredPosition;
+        transform.LookAt(target.position + Vector3.up * 1.5f);
     }
 }

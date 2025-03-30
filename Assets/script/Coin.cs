@@ -7,10 +7,13 @@ public class Coin : MonoBehaviour
     public enum CoinType { Touch, Hook }
     public CoinType coinType = CoinType.Touch;
 
-    public int coinValue = 1;
+    public int coinValue = 1; 
 
     private bool collected = false;
-
+    void Update() 
+    {
+        transform.Rotate(0 , 90 * Time.deltaTime,0);
+    }
     // Called when player physically touches the coin
     private void OnTriggerEnter(Collider other)
     {
@@ -44,4 +47,5 @@ public class Coin : MonoBehaviour
 
         Destroy(gameObject);
     }
+    
 }

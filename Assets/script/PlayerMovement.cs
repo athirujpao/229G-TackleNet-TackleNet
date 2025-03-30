@@ -20,6 +20,10 @@ public class Player : MonoBehaviour
     bool isSwinging = false;
     Vector3 swingAnchor; 
 
+    [SerializeField] Transform cameraTransform;
+    
+    // awake gonna get in animator on squid to work but after the ui and end credit is finished
+
     // Initializes the player's Rigidbody and LineRenderer
     void Start()
     {
@@ -27,10 +31,10 @@ public class Player : MonoBehaviour
         rb.drag = airDrag; // Physics E: Air Resistance
 
         if (ropeLine != null)
-    {
-        ropeLine.positionCount = 2;      // Must set to 2 to avoid index error
-        ropeLine.enabled = false;        // Optional: hide rope until swinging
-    }
+        {
+            ropeLine.positionCount = 2;      // Must set to 2 to avoid index error
+            ropeLine.enabled = false;        // Optional: hide rope until swinging
+        }
     }
 
     // Update movement, jump and swinging logic
@@ -51,10 +55,17 @@ public class Player : MonoBehaviour
             HandleSwinging();
         }
 
-        // Handle hook attempt when player clicks
-        if (Input.GetMouseButtonDown(0) && !isSwinging)
+        // Handle hook attempt when player clicks and remove in one click
+        if (Input.GetMouseButtonDown(0))
         {
-            TryToHook();  // Try to hook onto a surface
+            if (isSwinging)
+            {
+                ReleaseHook(); 
+            }
+            else
+            {
+                TryToHook(); 
+            }
         }
 
         
@@ -65,8 +76,23 @@ public class Player : MonoBehaviour
         float moveX = Input.GetAxis("Horizontal");
         float moveZ = Input.GetAxis("Vertical");
 
-        Vector3 move = new Vector3(moveX, 0 ,moveZ) * moveForce;
-        rb.AddForce(move, ForceMode.Force); // Physics C: Based Movement 
+        // made new camera to make gameplay more impressed
+        Vector3 camForward = cameraTransform.forward;
+        camForward.y = 0;
+        camForward.Normalize();
+
+        Vector3 camRight = cameraTransform.right;
+        camRight.y = 0;
+        camRight.Normalize();
+
+        Vector3 move = camForward * moveZ + camRight * moveX;
+        rb.AddForce(move.normalized* moveForce, ForceMode.Force); // Physics C: Based Movement 
+        // make model facing the right direction i find how to made this in reddit thank for random guy that name deleted account 
+        if (move != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(move);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
+        }
     }
     // swing logic
     void HandleSwinging()
@@ -109,6 +135,16 @@ public class Player : MonoBehaviour
                 AttachSwing(hit);  // Attach spring joint to start physics-based swinging
             }
             //else will be like robe fall like cant reach
+            // added the coin hook
+            if (hit.collider.CompareTag("Coin"))
+            {
+                Coin coin = hit.collider.GetComponent<Coin>();
+                if (coin != null)
+                {
+                    coin.CollectByHook(); // Only for hookable coins
+                }
+            }
+            
         }
     }
 
@@ -123,6 +159,22 @@ public class Player : MonoBehaviour
         spring.spring = 10f;  // Control strength of spring (affects swing speed)
         spring.damper = 1f;  // Damping to smooth out the swinging motion
         spring.maxDistance = maxSwingDistance;  // Limit how far the player can swing
+    }
+
+        void ReleaseHook()
+    {
+        isSwinging = false;
+
+        SpringJoint sj = GetComponent<SpringJoint>();
+        if (sj != null)
+        {
+            Destroy(sj);
+        }
+
+        if (ropeLine != null)
+        {
+            ropeLine.enabled = false;
+        }
     }
 
     void OnCollisionEnter(Collision collision)
