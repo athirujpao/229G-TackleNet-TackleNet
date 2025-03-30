@@ -41,9 +41,8 @@ public class Coin : MonoBehaviour
     {
         collected = true;
 
-        GameUIManager ui = FindObjectOfType<GameUIManager>();
-        if (ui != null) ui.AddCoin();
         
+
         // TODO: Add score logic here (e.g., call GameManager or UIController)
         Debug.Log($"Collected coin worth {coinValue}");
 
