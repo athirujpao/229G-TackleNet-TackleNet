@@ -6,8 +6,9 @@ public class PlayerCamera : MonoBehaviour
 {
     public Transform target; // Player's Transform
     public Vector3 offset = new Vector3(0, 5, -7); 
-    public float smoothSpeed = 0.125f;  
-    public float rotationSpeed = 5f;    
+       
+
+    public float sensitivity = 3f;
 
     float yaw;
     float pitch;
