@@ -31,7 +31,7 @@ public class Player : BaseCharacter
     void Start()
     {
         
-        rb.drag = airDrag; // Physics E: Air Resistance
+        
 
         if (ropeLine != null)
         {
@@ -89,13 +89,21 @@ public class Player : BaseCharacter
         camRight.Normalize();
 
         Vector3 move = (camForward * moveZ + camRight * moveX).normalized;
-        rb.AddForce(move.normalized* moveForce, ForceMode.Force); // Physics C: Based Movement 
+
+        float force = rb.mass * moveForce; // Physics C: Based Movement
+        rb.AddForce(move.normalized* force, ForceMode.Force);  
         // make model facing the right direction i find how to made this in reddit thank for random guy that name deleted account 
         if (move.magnitude > 0.1f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(move, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
         }
+
+        float k = 2f; 
+        Vector3 v = rb.velocity;
+        Vector3 Fd = -k * v;
+
+        rb.AddForce(Fd, ForceMode.Force); // Physics E: Air Resistance
     }
     // swing logic
     void HandleSwinging()
